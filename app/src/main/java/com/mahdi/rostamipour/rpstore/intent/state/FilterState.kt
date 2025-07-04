@@ -1,6 +1,8 @@
 package com.mahdi.rostamipour.rpstore.intent.state
 
+import com.mahdi.rostamipour.rpstore.model.FilteringModel
 import com.mahdi.rostamipour.rpstore.model.ProductsModel
+import java.util.logging.Filter
 
 sealed class FilterState {
 

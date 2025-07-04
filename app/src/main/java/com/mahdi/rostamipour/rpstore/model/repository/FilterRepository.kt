@@ -6,4 +6,6 @@ class FilterRepository(val apiService: ApiService) {
 
     suspend fun getProductByCategory(categoryId : Int) = apiService.getProductsByCategory(categoryId)
 
+    suspend fun getFilteringItems() = apiService.getFilteringItems()
+
 }

@@ -1,6 +1,7 @@
 package com.mahdi.rostamipour.rpstore.service
 
 import com.mahdi.rostamipour.rpstore.model.CategoryModel
+import com.mahdi.rostamipour.rpstore.model.FilteringModel
 import com.mahdi.rostamipour.rpstore.model.ProductsModel
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -31,6 +32,10 @@ class ApiService {
                 parameters.append("categoryId", categoryId.toString())
             }
         }.body()
+    }
+
+    suspend fun getFilteringItems() : FilteringModel{
+        return httpClient.get("http://10.0.85.2:3000/filtering").body()
     }
 
 }

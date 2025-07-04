@@ -3,6 +3,7 @@ package com.mahdi.rostamipour.rpstore.pages
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
@@ -45,6 +47,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.mahdi.rostamipour.rpstore.intent.FilterIntent
@@ -56,7 +60,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 @Preview(showBackground = true , showSystemUi = true)
 fun CategoriesScreen(categoryId : Int = 0,
-                     filterViewModel: FilterViewModel = koinViewModel()) {
+                     filterViewModel: FilterViewModel = koinViewModel(),navigation : NavHostController = rememberNavController()) {
 
     val context = LocalContext.current
 
@@ -69,21 +73,21 @@ fun CategoriesScreen(categoryId : Int = 0,
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ){
-        Card(Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            elevation = CardDefaults.elevatedCardElevation(8.dp)
-        ) {
+        Card(Modifier.fillMaxWidth().clickable(true, onClick = {
+            navigation.navigate("FilterScreen")
+        }),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(16.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Menu,
-                    contentDescription = "Favorite",
+                    contentDescription = "",
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "متن مورد علاقه من")
+                Text(text = "Sort products")
             }
         }
 
@@ -95,19 +99,17 @@ fun CategoriesScreen(categoryId : Int = 0,
 
         when (filterByCategory){
             is FilterState.Idle , is FilterState.Loading->{
-                //
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
 
             is FilterState.Error -> {
-                Text(text = (filterByCategory as FilterState.Error).message, modifier = Modifier.padding(8.dp), color = Color.Red)
+                //Text(text = (filterByCategory as FilterState.Error).message, modifier = Modifier.padding(8.dp), color = Color.Red)
             }
 
             is FilterState.Success -> {
                 val products = (filterByCategory as FilterState.Success).products
-
-                Text("Favorite Products", modifier = Modifier.padding(12.dp).wrapContentWidth(Alignment.Start)
-                    , color = Color.Black , fontSize = 15.sp)
-
 
                 LazyVerticalGrid (
                     columns = GridCells.Fixed(2),

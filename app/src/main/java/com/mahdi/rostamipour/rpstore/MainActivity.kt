@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -29,10 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mahdi.rostamipour.rpstore.pages.CartScreen
 import com.mahdi.rostamipour.rpstore.pages.CategoriesScreen
+import com.mahdi.rostamipour.rpstore.pages.FilterScreen
 import com.mahdi.rostamipour.rpstore.pages.HomeScreen
 import com.mahdi.rostamipour.rpstore.pages.ProfileScreen
 import com.mahdi.rostamipour.rpstore.ui.theme.RPStoreTheme
@@ -61,6 +64,12 @@ fun Greeting() {
     )
     var selectedDestination = rememberSaveable { mutableStateOf(destinations.first().route) }
 
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = currentBackStackEntry?.destination?.route
+
+    // فقط اگر مقصد یکی از صفحه‌های bottom nav باشد، نوار پایین نمایش داده شود
+    val shouldShowBottomBar = destinations.any { it.route == currentDestination }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -73,21 +82,23 @@ fun Greeting() {
             )
         },
         bottomBar = {
-            NavigationBar {
-                destinations.forEach { item ->
-                    NavigationBarItem(
-                        selected = selectedDestination.value == item.route,
-                        onClick = {
-                            selectedDestination.value = item.route
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) }
-                    )
+            if (shouldShowBottomBar) {
+                NavigationBar {
+                    destinations.forEach { item ->
+                        NavigationBarItem(
+                            selected = selectedDestination.value == item.route,
+                            onClick = {
+                                selectedDestination.value = item.route
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            icon = { Icon(item.icon, contentDescription = item.label) },
+                            label = { Text(item.label) }
+                        )
+                    }
                 }
             }
         }
@@ -113,7 +124,11 @@ fun Greeting() {
             ) { backStackEntry ->
                 val categoryId = backStackEntry.arguments?.getInt("categoryId")
                 // Your CategoriesScreen composable here
-                CategoriesScreen(categoryId = categoryId?:0)
+                CategoriesScreen(categoryId = categoryId?:0,  navigation = navController)
+            }
+
+            composable("FilterScreen") {
+                FilterScreen(navigation = navController)
             }
         }
     }
